@@ -10,12 +10,12 @@ function Services() {
   const [editServiceDesc, setEditServiceDesc] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/services")
+    axios.get("https://portfolio-backend-e0d6.onrender.com/api/services")
       .then(res => setServices(res.data));
   }, []);
 
   const addService = () => {
-    axios.post("http://localhost:5000/api/services", {
+    axios.post("https://portfolio-backend-e0d6.onrender.com/api/services", {
       title: serviceTitle,
       description: serviceDesc
     }).then(res => {
@@ -26,12 +26,14 @@ function Services() {
   };
 
   const deleteService = (id) => {
-    axios.delete(`http://localhost:5000/api/services/${id}`)
+    axios.delete(`https://portfolio-backend-e0d6.onrender.com/api/services/${id}`)
       .then(() => setServices(services.filter(s => s._id !== id)));
   };
 
   const updateService = () => {
-    axios.put(`http://localhost:5000/api/services/${editServiceId}`, {
+    if (!editServiceId) return;
+
+    axios.put(`https://portfolio-backend-e0d6.onrender.com/api/services/${editServiceId}`, {
       title: editServiceTitle,
       description: editServiceDesc
     }).then(res => {
@@ -44,7 +46,8 @@ function Services() {
 
   return (
     <div>
-        <h1>Services</h1>
+      <h1>Services</h1>
+
       <h2>Add Service</h2>
       <input placeholder="Title" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} />
       <input placeholder="Description" value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} />
@@ -57,13 +60,16 @@ function Services() {
 
       <h2>Services</h2>
       {services.map(s => (
-<div className="card" key={s._id}>          <strong>{s.title}</strong>
+        <div className="card" key={s._id} style={{ margin: "10px 0" }}>
+          <strong>{s.title}</strong>
           <p>{s.description}</p>
+
           <button onClick={() => {
             setEditServiceId(s._id);
             setEditServiceTitle(s.title);
             setEditServiceDesc(s.description);
           }}>Edit</button>
+
           <button onClick={() => deleteService(s._id)}>Delete</button>
         </div>
       ))}

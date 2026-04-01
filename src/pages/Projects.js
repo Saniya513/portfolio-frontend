@@ -10,12 +10,12 @@ function Projects() {
   const [editProjectDesc, setEditProjectDesc] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/projects")
+    axios.get("https://portfolio-backend-e0d6.onrender.com/api/projects")
       .then(res => setProjects(res.data));
   }, []);
 
   const addProject = () => {
-    axios.post("http://localhost:5000/api/projects", {
+    axios.post("https://portfolio-backend-e0d6.onrender.com/api/projects", {
       title: projectTitle,
       description: projectDesc
     }).then(res => {
@@ -26,12 +26,14 @@ function Projects() {
   };
 
   const deleteProject = (id) => {
-    axios.delete(`http://localhost:5000/api/projects/${id}`)
+    axios.delete(`https://portfolio-backend-e0d6.onrender.com/api/projects/${id}`)
       .then(() => setProjects(projects.filter(p => p._id !== id)));
   };
 
   const updateProject = () => {
-    axios.put(`http://localhost:5000/api/projects/${editProjectId}`, {
+    if (!editProjectId) return;
+
+    axios.put(`https://portfolio-backend-e0d6.onrender.com/api/projects/${editProjectId}`, {
       title: editProjectTitle,
       description: editProjectDesc
     }).then(res => {
@@ -44,7 +46,8 @@ function Projects() {
 
   return (
     <div>
-        <h1>Projects</h1>
+      <h1>Projects</h1>
+
       <h2>Add Project</h2>
       <input placeholder="Title" value={projectTitle} onChange={(e) => setProjectTitle(e.target.value)} />
       <input placeholder="Description" value={projectDesc} onChange={(e) => setProjectDesc(e.target.value)} />
@@ -57,14 +60,16 @@ function Projects() {
 
       <h2>Projects</h2>
       {projects.map(p => (
-        <div className="card" key={p._id}>
+        <div className="card" key={p._id} style={{ margin: "10px 0" }}>
           <strong>{p.title}</strong>
           <p>{p.description}</p>
+
           <button onClick={() => {
             setEditProjectId(p._id);
             setEditProjectTitle(p.title);
             setEditProjectDesc(p.description);
           }}>Edit</button>
+
           <button onClick={() => deleteProject(p._id)}>Delete</button>
         </div>
       ))}

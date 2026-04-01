@@ -12,12 +12,12 @@ function References() {
   const [editRefEmail, setEditRefEmail] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/references")
+    axios.get("https://portfolio-backend-e0d6.onrender.com/api/references")
       .then(res => setReferences(res.data));
   }, []);
 
   const addReference = () => {
-    axios.post("http://localhost:5000/api/references", {
+    axios.post("https://portfolio-backend-e0d6.onrender.com/api/references", {
       firstname: refFirst,
       lastname: refLast,
       email: refEmail
@@ -30,12 +30,14 @@ function References() {
   };
 
   const deleteReference = (id) => {
-    axios.delete(`http://localhost:5000/api/references/${id}`)
+    axios.delete(`https://portfolio-backend-e0d6.onrender.com/api/references/${id}`)
       .then(() => setReferences(references.filter(r => r._id !== id)));
   };
 
   const updateReference = () => {
-    axios.put(`http://localhost:5000/api/references/${editRefId}`, {
+    if (!editRefId) return;
+
+    axios.put(`https://portfolio-backend-e0d6.onrender.com/api/references/${editRefId}`, {
       firstname: editRefFirst,
       lastname: editRefLast,
       email: editRefEmail
@@ -50,7 +52,8 @@ function References() {
 
   return (
     <div>
-        <h1>References</h1>
+      <h1>References</h1>
+
       <h2>Add Reference</h2>
       <input placeholder="First Name" value={refFirst} onChange={(e) => setRefFirst(e.target.value)} />
       <input placeholder="Last Name" value={refLast} onChange={(e) => setRefLast(e.target.value)} />
@@ -65,14 +68,17 @@ function References() {
 
       <h2>References</h2>
       {references.map(r => (
-<div className="card" key={r._id}>          <p>{r.firstname} {r.lastname}</p>
+        <div className="card" key={r._id} style={{ margin: "10px 0" }}>
+          <p>{r.firstname} {r.lastname}</p>
           <p>{r.email}</p>
+
           <button onClick={() => {
             setEditRefId(r._id);
             setEditRefFirst(r.firstname);
             setEditRefLast(r.lastname);
             setEditRefEmail(r.email);
           }}>Edit</button>
+
           <button onClick={() => deleteReference(r._id)}>Delete</button>
         </div>
       ))}
