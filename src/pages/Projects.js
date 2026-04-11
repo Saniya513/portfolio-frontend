@@ -1,79 +1,91 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Projects() {
   const [projects, setProjects] = useState([]);
-  const [projectTitle, setProjectTitle] = useState("");
-  const [projectDesc, setProjectDesc] = useState("");
-  const [editProjectId, setEditProjectId] = useState(null);
-  const [editProjectTitle, setEditProjectTitle] = useState("");
-  const [editProjectDesc, setEditProjectDesc] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  // GET
+  const fetchProjects = async () => {
+    const res = await fetch("http://localhost:5000/api/projects");
+    const data = await res.json();
+    setProjects(data);
+  };
 
   useEffect(() => {
-    axios.get("https://portfolio-backend-e0d6.onrender.com/api/projects")
-      .then(res => setProjects(res.data));
+    fetchProjects();
   }, []);
 
-  const addProject = () => {
-    axios.post("https://portfolio-backend-e0d6.onrender.com/api/projects", {
-      title: projectTitle,
-      description: projectDesc
-    }).then(res => {
-      setProjects([...projects, res.data]);
-      setProjectTitle("");
-      setProjectDesc("");
+  // ADD
+  const addProject = async () => {
+    await fetch("http://localhost:5000/api/projects", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ title, description })
     });
+
+    fetchProjects();
   };
 
-  const deleteProject = (id) => {
-    axios.delete(`https://portfolio-backend-e0d6.onrender.com/api/projects/${id}`)
-      .then(() => setProjects(projects.filter(p => p._id !== id)));
-  };
-
-  const updateProject = () => {
-    if (!editProjectId) return;
-
-    axios.put(`https://portfolio-backend-e0d6.onrender.com/api/projects/${editProjectId}`, {
-      title: editProjectTitle,
-      description: editProjectDesc
-    }).then(res => {
-      setProjects(projects.map(p => p._id === editProjectId ? res.data : p));
-      setEditProjectId(null);
-      setEditProjectTitle("");
-      setEditProjectDesc("");
+  // DELETE
+  const deleteProject = async (id) => {
+    await fetch(`http://localhost:5000/api/projects/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": "Bearer " + token
+      }
     });
+
+    fetchProjects();
   };
 
   return (
     <div>
-      <h1>Projects</h1>
+  <h2>Projects</h2>
 
-      <h2>Add Project</h2>
-      <input placeholder="Title" value={projectTitle} onChange={(e) => setProjectTitle(e.target.value)} />
-      <input placeholder="Description" value={projectDesc} onChange={(e) => setProjectDesc(e.target.value)} />
-      <button onClick={addProject}>Add</button>
+  <div>
+    <label htmlFor="title">Project Title</label>
+    <input
+      id="title"
+      type="text"
+      placeholder="Title"
+      onChange={(e) => setTitle(e.target.value)}
+    />
+  </div>
 
-      <h2>Edit Project</h2>
-      <input value={editProjectTitle} onChange={(e) => setEditProjectTitle(e.target.value)} />
-      <input value={editProjectDesc} onChange={(e) => setEditProjectDesc(e.target.value)} />
-      <button onClick={updateProject}>Update</button>
+  <div>
+    <label htmlFor="description">Description</label>
+    <input
+      id="description"
+      type="text"
+      placeholder="Description"
+      onChange={(e) => setDescription(e.target.value)}
+    />
+  </div>
 
-      <h2>Projects</h2>
-      {projects.map(p => (
-        <div className="card" key={p._id} style={{ margin: "10px 0" }}>
-          <strong>{p.title}</strong>
-          <p>{p.description}</p>
+  <button onClick={addProject} aria-label="Add new project">
+    Add Project
+  </button>
 
-          <button onClick={() => {
-            setEditProjectId(p._id);
-            setEditProjectTitle(p.title);
-            setEditProjectDesc(p.description);
-          }}>Edit</button>
-
-          <button onClick={() => deleteProject(p._id)}>Delete</button>
-        </div>
-      ))}
-    </div>
+  <ul>
+    {projects.map((p) => (
+      <li key={p._id}>
+        {p.title} - {p.description}
+        <button
+          onClick={() => deleteProject(p._id)}
+          aria-label={`Delete project ${p.title}`}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
   );
 }
 

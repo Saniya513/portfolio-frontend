@@ -1,79 +1,88 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Services() {
   const [services, setServices] = useState([]);
-  const [serviceTitle, setServiceTitle] = useState("");
-  const [serviceDesc, setServiceDesc] = useState("");
-  const [editServiceId, setEditServiceId] = useState(null);
-  const [editServiceTitle, setEditServiceTitle] = useState("");
-  const [editServiceDesc, setEditServiceDesc] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  const fetchServices = async () => {
+    const res = await fetch("http://localhost:5000/api/services");
+    const data = await res.json();
+    setServices(data);
+  };
 
   useEffect(() => {
-    axios.get("https://portfolio-backend-e0d6.onrender.com/api/services")
-      .then(res => setServices(res.data));
+    fetchServices();
   }, []);
 
-  const addService = () => {
-    axios.post("https://portfolio-backend-e0d6.onrender.com/api/services", {
-      title: serviceTitle,
-      description: serviceDesc
-    }).then(res => {
-      setServices([...services, res.data]);
-      setServiceTitle("");
-      setServiceDesc("");
+  const addService = async () => {
+    await fetch("http://localhost:5000/api/services", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ name, description })
     });
+
+    fetchServices();
   };
 
-  const deleteService = (id) => {
-    axios.delete(`https://portfolio-backend-e0d6.onrender.com/api/services/${id}`)
-      .then(() => setServices(services.filter(s => s._id !== id)));
-  };
-
-  const updateService = () => {
-    if (!editServiceId) return;
-
-    axios.put(`https://portfolio-backend-e0d6.onrender.com/api/services/${editServiceId}`, {
-      title: editServiceTitle,
-      description: editServiceDesc
-    }).then(res => {
-      setServices(services.map(s => s._id === editServiceId ? res.data : s));
-      setEditServiceId(null);
-      setEditServiceTitle("");
-      setEditServiceDesc("");
+  const deleteService = async (id) => {
+    await fetch(`http://localhost:5000/api/services/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": "Bearer " + token
+      }
     });
+
+    fetchServices();
   };
 
   return (
     <div>
-      <h1>Services</h1>
+  <h2>Services</h2>
 
-      <h2>Add Service</h2>
-      <input placeholder="Title" value={serviceTitle} onChange={(e) => setServiceTitle(e.target.value)} />
-      <input placeholder="Description" value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} />
-      <button onClick={addService}>Add</button>
+  <div>
+    <label htmlFor="name">Service Name</label>
+    <input
+      id="name"
+      type="text"
+      placeholder="Name"
+      onChange={(e) => setName(e.target.value)}
+    />
+  </div>
 
-      <h2>Edit Service</h2>
-      <input value={editServiceTitle} onChange={(e) => setEditServiceTitle(e.target.value)} />
-      <input value={editServiceDesc} onChange={(e) => setEditServiceDesc(e.target.value)} />
-      <button onClick={updateService}>Update</button>
+  <div>
+    <label htmlFor="description">Description</label>
+    <input
+      id="description"
+      type="text"
+      placeholder="Description"
+      onChange={(e) => setDescription(e.target.value)}
+    />
+  </div>
 
-      <h2>Services</h2>
-      {services.map(s => (
-        <div className="card" key={s._id} style={{ margin: "10px 0" }}>
-          <strong>{s.title}</strong>
-          <p>{s.description}</p>
+  <button onClick={addService} aria-label="Add new service">
+    Add Service
+  </button>
 
-          <button onClick={() => {
-            setEditServiceId(s._id);
-            setEditServiceTitle(s.title);
-            setEditServiceDesc(s.description);
-          }}>Edit</button>
-
-          <button onClick={() => deleteService(s._id)}>Delete</button>
-        </div>
-      ))}
-    </div>
+  <ul>
+    {services.map((s) => (
+      <li key={s._id}>
+        {s.name} - {s.description}
+        <button
+          onClick={() => deleteService(s._id)}
+          aria-label={`Delete service ${s.name}`}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
   );
 }
 

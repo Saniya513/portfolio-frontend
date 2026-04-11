@@ -1,88 +1,88 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 
 function References() {
   const [references, setReferences] = useState([]);
-  const [refFirst, setRefFirst] = useState("");
-  const [refLast, setRefLast] = useState("");
-  const [refEmail, setRefEmail] = useState("");
-  const [editRefId, setEditRefId] = useState(null);
-  const [editRefFirst, setEditRefFirst] = useState("");
-  const [editRefLast, setEditRefLast] = useState("");
-  const [editRefEmail, setEditRefEmail] = useState("");
+  const [name, setName] = useState("");
+  const [review, setReview] = useState("");
+
+  const token = localStorage.getItem("token");
+
+  const fetchReferences = async () => {
+    const res = await fetch("http://localhost:5000/api/references");
+    const data = await res.json();
+    setReferences(data);
+  };
 
   useEffect(() => {
-    axios.get("https://portfolio-backend-e0d6.onrender.com/api/references")
-      .then(res => setReferences(res.data));
+    fetchReferences();
   }, []);
 
-  const addReference = () => {
-    axios.post("https://portfolio-backend-e0d6.onrender.com/api/references", {
-      firstname: refFirst,
-      lastname: refLast,
-      email: refEmail
-    }).then(res => {
-      setReferences([...references, res.data]);
-      setRefFirst("");
-      setRefLast("");
-      setRefEmail("");
+  const addReference = async () => {
+    await fetch("http://localhost:5000/api/references", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ name, review })
     });
+
+    fetchReferences();
   };
 
-  const deleteReference = (id) => {
-    axios.delete(`https://portfolio-backend-e0d6.onrender.com/api/references/${id}`)
-      .then(() => setReferences(references.filter(r => r._id !== id)));
-  };
-
-  const updateReference = () => {
-    if (!editRefId) return;
-
-    axios.put(`https://portfolio-backend-e0d6.onrender.com/api/references/${editRefId}`, {
-      firstname: editRefFirst,
-      lastname: editRefLast,
-      email: editRefEmail
-    }).then(res => {
-      setReferences(references.map(r => r._id === editRefId ? res.data : r));
-      setEditRefId(null);
-      setEditRefFirst("");
-      setEditRefLast("");
-      setEditRefEmail("");
+  const deleteReference = async (id) => {
+    await fetch(`http://localhost:5000/api/references/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": "Bearer " + token
+      }
     });
+
+    fetchReferences();
   };
 
   return (
     <div>
-      <h1>References</h1>
+  <h2>References</h2>
 
-      <h2>Add Reference</h2>
-      <input placeholder="First Name" value={refFirst} onChange={(e) => setRefFirst(e.target.value)} />
-      <input placeholder="Last Name" value={refLast} onChange={(e) => setRefLast(e.target.value)} />
-      <input placeholder="Email" value={refEmail} onChange={(e) => setRefEmail(e.target.value)} />
-      <button onClick={addReference}>Add</button>
+  <div>
+    <label htmlFor="name">Client Name</label>
+    <input
+      id="name"
+      type="text"
+      placeholder="Name"
+      onChange={(e) => setName(e.target.value)}
+    />
+  </div>
 
-      <h2>Edit Reference</h2>
-      <input value={editRefFirst} onChange={(e) => setEditRefFirst(e.target.value)} />
-      <input value={editRefLast} onChange={(e) => setEditRefLast(e.target.value)} />
-      <input value={editRefEmail} onChange={(e) => setEditRefEmail(e.target.value)} />
-      <button onClick={updateReference}>Update</button>
+  <div>
+    <label htmlFor="review">Review</label>
+    <input
+      id="review"
+      type="text"
+      placeholder="Review"
+      onChange={(e) => setReview(e.target.value)}
+    />
+  </div>
 
-      <h2>References</h2>
-      {references.map(r => (
-        <div className="card" key={r._id} style={{ margin: "10px 0" }}>
-          <p>{r.firstname} {r.lastname}</p>
-          <p>{r.email}</p>
+  <button onClick={addReference} aria-label="Add new reference">
+    Add Reference
+  </button>
 
-          <button onClick={() => {
-            setEditRefId(r._id);
-            setEditRefFirst(r.firstname);
-            setEditRefLast(r.lastname);
-            setEditRefEmail(r.email);
-          }}>Edit</button>
-
-          <button onClick={() => deleteReference(r._id)}>Delete</button>
-        </div>
-      ))}
-    </div>
+  <ul>
+    {references.map((r) => (
+      <li key={r._id}>
+        {r.name} - {r.review}
+        <button
+          onClick={() => deleteReference(r._id)}
+          aria-label={`Delete reference from ${r.name}`}
+        >
+          Delete
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
   );
 }
 
