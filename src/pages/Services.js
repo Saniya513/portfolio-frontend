@@ -31,7 +31,7 @@ function Services() {
   };
 
   const deleteService = async (id) => {
-    await fetch(`http://localhost:5000/api/services/${id}`, {
+    await fetch(`https://portfolio-backend-1-b71s.onrender.com/api/services/${id}`, {
       method: "DELETE",
       headers: {
         "Authorization": "Bearer " + token

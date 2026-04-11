@@ -5,7 +5,7 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:5000/api/auth/signin", {
+    const res = await fetch("https://portfolio-backend-1-b71s.onrender.com/api/auth/signin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

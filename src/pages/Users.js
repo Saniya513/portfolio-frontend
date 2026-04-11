@@ -10,7 +10,7 @@ function Users() {
   // GET users
   useEffect(() => {
     axios
-      .get("https://portfolio-backend-e0d6.onrender.com/api/users")
+      .get("https://portfolio-backend-1-b71s.onrender.com/api/users")
       .then((res) => setUsers(res.data));
   }, []);
 
