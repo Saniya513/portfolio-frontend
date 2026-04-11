@@ -18,7 +18,7 @@ function Services() {
   }, []);
 
   const addService = async () => {
-    await fetch("http://localhost:5000/api/services", {
+    await fetch("https://portfolio-backend-1-b71s.onrender.com/api/services", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

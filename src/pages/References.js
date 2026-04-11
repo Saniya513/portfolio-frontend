@@ -8,7 +8,7 @@ function References() {
   const token = localStorage.getItem("token");
 
   const fetchReferences = async () => {
-    const res = await fetch("http://localhost:5000/api/references");
+    const res = await fetch("https://portfolio-backend-1-b71s.onrender.com/api/references");
     const data = await res.json();
     setReferences(data);
   };
@@ -18,7 +18,7 @@ function References() {
   }, []);
 
   const addReference = async () => {
-    await fetch("http://localhost:5000/api/references", {
+    await fetch("https://portfolio-backend-1-b71s.onrender.com/api/references", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

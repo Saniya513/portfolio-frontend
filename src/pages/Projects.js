@@ -9,7 +9,7 @@ function Projects() {
 
   // GET
   const fetchProjects = async () => {
-    const res = await fetch("http://localhost:5000/api/projects");
+    const res = await fetch("https://portfolio-backend-1-b71s.onrender.com/api/projects");
     const data = await res.json();
     setProjects(data);
   };
@@ -20,7 +20,7 @@ function Projects() {
 
   // ADD
   const addProject = async () => {
-    await fetch("http://localhost:5000/api/projects", {
+    await fetch("https://portfolio-backend-1-b71s.onrender.com/api/projects", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,46 +46,33 @@ function Projects() {
 
   return (
     <div>
-  <h2>Projects</h2>
+      <h2>Projects</h2>
 
-  <div>
-    <label htmlFor="title">Project Title</label>
-    <input
-      id="title"
-      type="text"
-      placeholder="Title"
-      onChange={(e) => setTitle(e.target.value)}
-    />
-  </div>
+      <label htmlFor="title">Project Title</label>
+<input
+  id="title"
+  type="text"
+  placeholder="Title"
+  onChange={(e) => setTitle(e.target.value)}
+/>
 
-  <div>
-    <label htmlFor="description">Description</label>
-    <input
-      id="description"
-      type="text"
-      placeholder="Description"
-      onChange={(e) => setDescription(e.target.value)}
-    />
-  </div>
+<input
+  id="description"
+  type="text"
+  placeholder="Description"
+  onChange={(e) => setDescription(e.target.value)}
+/>
+      <button onClick={addProject}>Add Project</button>
 
-  <button onClick={addProject} aria-label="Add new project">
-    Add Project
-  </button>
-
-  <ul>
-    {projects.map((p) => (
-      <li key={p._id}>
-        {p.title} - {p.description}
-        <button
-          onClick={() => deleteProject(p._id)}
-          aria-label={`Delete project ${p.title}`}
-        >
-          Delete
-        </button>
-      </li>
-    ))}
-  </ul>
-</div>
+      <ul>
+        {projects.map((p) => (
+          <li key={p._id}>
+            {p.title} - {p.description}
+            <button onClick={() => deleteProject(p._id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
