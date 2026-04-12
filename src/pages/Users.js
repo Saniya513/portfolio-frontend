@@ -7,46 +7,59 @@ function Users() {
   const [editEmail, setEditEmail] = useState("");
   const [editId, setEditId] = useState(null);
 
-  // GET users
+  const BASE_URL = "https://portfolio-backend-1-b71s.onrender.com";
+
+  // GET USERS
   useEffect(() => {
     axios
-      .get("https://portfolio-backend-1-b71s.onrender.com/api/users")
-      .then((res) => setUsers(res.data));
+      .get(`${BASE_URL}/api/users`)
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.log(err));
   }, []);
 
-  // ADD user
+  // ADD USER
   const addUser = () => {
     if (!email) return;
 
     axios
-      .post("https://portfolio-backend-e0d6.onrender.com/api/users", { email })
+      .post(`${BASE_URL}/api/users`, { email })
       .then((res) => {
         setUsers([...users, res.data]);
         setEmail("");
-      });
+      })
+      .catch((err) => console.log(err));
   };
 
-  // DELETE user
+  // DELETE USER ✅ FIXED
   const deleteUser = (id) => {
     axios
-      .delete(`https://portfolio-backend-e0d6.onrender.com/api/users/${id}`)
-      .then(() => setUsers(users.filter((u) => u._id !== id)));
+      .delete(`${BASE_URL}/api/users/${id}`)
+      .then(() => {
+        setUsers(users.filter((u) => u._id !== id));
+
+        // 🔥 FIX: prevent crash
+        if (editId === id) {
+          setEditId(null);
+          setEditEmail("");
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
-  // UPDATE user
+  // UPDATE USER
   const updateUser = () => {
     if (!editId) return;
 
     axios
-      .put(
-        `https://portfolio-backend-e0d6.onrender.com/api/users/${editId}`,
-        { email: editEmail }
-      )
+      .put(`${BASE_URL}/api/users/${editId}`, {
+        email: editEmail,
+      })
       .then((res) => {
         setUsers(users.map((u) => (u._id === editId ? res.data : u)));
         setEditId(null);
         setEditEmail("");
-      });
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -74,12 +87,8 @@ function Users() {
       {/* USERS LIST */}
       <h2>Users</h2>
       {users.map((u) => (
-        <div
-          className="card"
-          key={u._id}
-          style={{ margin: "10px 0" }}
-        >
-          <span style={{ marginRight: "10px" }}>{u.email}</span>
+        <div key={u._id} style={{ margin: "10px 0" }}>
+          <span>{u.email}</span>
 
           <button
             onClick={() => {
@@ -90,12 +99,9 @@ function Users() {
             Edit
           </button>
 
-          <button
-            onClick={() => deleteUser(u._id)}
-            style={{ marginLeft: "10px" }}
-          >
-            Delete
-          </button>
+          <button onClick={() => deleteUser(u._id)}>
+  Delete
+</button>
         </div>
       ))}
     </div>
