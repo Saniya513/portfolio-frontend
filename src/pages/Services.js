@@ -8,7 +8,7 @@ function Services() {
   const token = localStorage.getItem("token");
 
   const fetchServices = async () => {
-    const res = await fetch("http://localhost:5000/api/services");
+    const res = await fetch("https://portfolio-backend-1-b71s.onrender.com/api/services");
     const data = await res.json();
     setServices(data);
   };
